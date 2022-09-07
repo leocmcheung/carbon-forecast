@@ -31,3 +31,4 @@ termcolor
 #special for our project
 darts
 jupyter
+tensorflow==2.8.0
