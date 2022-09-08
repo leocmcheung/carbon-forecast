@@ -31,3 +31,4 @@ termcolor
 #special for our project
 darts
 jupyter
+openpyxl
