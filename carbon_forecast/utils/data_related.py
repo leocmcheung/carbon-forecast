@@ -2,10 +2,6 @@ import pandas as pd
 import numpy as np
 
 
-
-
-
-
 def show_sector():
     """
     To help with initial data filtering on Historical Emission csv
