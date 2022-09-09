@@ -1,7 +1,13 @@
-import selectors
+
 import pandas as pd
 import numpy as np
+"""
+README FIRST
 
+Use load_n_preproc(year) to extract ONE year of data
+Use load_n_preproc_all_avail() to get >>all years<< data
+    (from 2013 as climate strategy score only available since 2013)
+"""
 
 def load_n_preproc(year):
     """
@@ -502,9 +508,17 @@ def load_n_preproc(year):
     df = c_score_fill(df, year=year)
     print("Cleaning P/E Ratio...")
     df = pe_cleaning(df, year=year)
-
-    col_to_keep =  ["company_name", "TCUID", "Sector", "Employees / Revenue", "EV / Revenue"] + year_col + power_pct_to_clean + sector_rev_to_clean
+    df["year"] = year
+    col_to_keep =  ["company_name", "TCUID", "year", "Sector", "Employees / Revenue", "EV / Revenue"] + year_col + power_pct_to_clean + sector_rev_to_clean
     df = df[col_to_keep]
+    print("Adding Scope 1 and Scope 2 data together...")
+    df = scope_1_2_add(df,year)
+    print("Doing some column renaming...")
+    df = rename_year_col(df,year=year)
+    reshuffle_list = df.columns.tolist()[:8] + [df.columns.tolist()[-1]] + df.columns.tolist()[8:-1]
+    df = df.reindex(columns=reshuffle_list)
+    print(f"Dataset preproc-ed for the year {year}!👍")
+
     return df
 
 def rename_pe(df):
@@ -549,8 +563,26 @@ def c_score_fill(df,year):
 def pe_cleaning(df, year):
     df[f"pe_ratio{year}"].fillna(0., inplace=True)
     df[f"pe_ratio{year}"].replace("NM",0., inplace=True)
-    df[f"pe_ratio{year}"].astype(dtype="float64")
+    df[f"pe_ratio{year}"] = df[f"pe_ratio{year}"].astype(dtype="float64")
     return df
+
+def rename_year_col(df,year):
+    year_col = df.columns[df.columns.str.endswith(f"{year}")].tolist()
+    for i in year_col:
+        df.rename(columns={i:i[:-6]}, inplace=True)
+    return df
+
+def scope_1_2_add(df,year):
+    df["intensity_1and2"] = df[f"intensity_scope1_CY{year}"] + df[f"intensity_scope2CY{year}"]
+    df.drop(columns=[f"intensity_scope1_CY{year}", f"intensity_scope2CY{year}"], inplace=True)
+    return df
+
+def load_n_preproc_all_avail():
+    years = [2013,2014,2015,2016,2017,2018,2019,2020]
+    output = pd.DataFrame()
+    for year in years:
+        output = pd.concat([output, load_n_preproc(year)])
+    return output
 
 if __name__ == '__main__':
     year = 2020
