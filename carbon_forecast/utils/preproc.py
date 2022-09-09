@@ -585,6 +585,4 @@ def load_n_preproc_all_avail():
     return output
 
 if __name__ == '__main__':
-    year = 2020
-    print("Test - 2020 data preproc")
-    load_n_preproc(year)
+    load_n_preproc_all_avail()
