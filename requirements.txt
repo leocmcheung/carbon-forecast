@@ -32,3 +32,8 @@ termcolor
 darts
 jupyter
 openpyxl
+tensorflow==2.8.0
+xgboost
+flaml
+streamlit
+
