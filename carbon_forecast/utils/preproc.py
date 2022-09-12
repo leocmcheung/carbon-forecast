@@ -1,4 +1,5 @@
 
+from dis import dis
 import pandas as pd
 import numpy as np
 """
@@ -476,10 +477,6 @@ def load_n_preproc(year):
     df = power_pct_cleaning(df, power_pct_to_clean)
     print("Preproc on Sector Revenue")
     df = sector_rev_cleaning(df, sector_rev_to_clean)
-    # print("Calculating Employees / revenue...")
-    # df = employee(df)
-    # print("Cleaning P/E Ratio...")
-    # df = pe_cleaning(df)
     print(f"Selecting the year {year} required...")
     year_col = sorted(df.columns[df.columns.str.endswith(f"{year}")])
 
@@ -515,6 +512,8 @@ def load_n_preproc(year):
     df = scope_1_2_add(df,year)
     print("Doing some column renaming...")
     df = rename_year_col(df,year=year)
+    print("Filling in Disclosure...")
+    df = disclosure_cleaning(df)
     reshuffle_list = df.columns.tolist()[:8] + [df.columns.tolist()[-1]] + df.columns.tolist()[8:-1]
     df = df.reindex(columns=reshuffle_list)
     print(f"Dataset preproc-ed for the year {year}!👍")
@@ -536,6 +535,10 @@ def power_pct_cleaning(df, power_pct_to_clean):
 
 def sector_rev_cleaning(df, sectors):
     df.loc[:,sectors] = df[sectors].fillna(0)
+    return df
+
+def disclosure_cleaning(df):
+    df.loc[:,"disclosure"] = df["disclosure"].fillna(0)
     return df
 
 def employee_fill(df):
