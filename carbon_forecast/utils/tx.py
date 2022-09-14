@@ -6,15 +6,13 @@ from sklearn.model_selection import train_test_split
 def our_tx(X):
     num_col = sorted(X.select_dtypes(include=["int64", "float64"]).columns)
     cat_col = sorted(list(set(X.columns) - set(num_col)))
-
-
+    breakpoint()
     num_transformer = MinMaxScaler()
     cat_transformer = OneHotEncoder(handle_unknown='ignore')
     tx = ColumnTransformer([
         ('num_tr', num_transformer, num_col),
         ('cat_tr', cat_transformer, cat_col)
-    ],
-    sparse_threshold=0)
+    ])#sparse_threshold=0)
     return tx
 
 def tt_split(X,y,transformer):
